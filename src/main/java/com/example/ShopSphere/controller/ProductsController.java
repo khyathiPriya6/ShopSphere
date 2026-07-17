@@ -4,9 +4,8 @@ import com.example.ShopSphere.model.entity.Product;
 import com.example.ShopSphere.service.ProductsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,4 +22,25 @@ public class ProductsController {
         log.info("Get All Products");
         return productsService.getAllProducts();
     }
+
+    @PostMapping
+    private ResponseEntity<Void> addProducts(@RequestBody List<Product> productList){
+        log.info("Adding products");
+        productsService.addProducts(productList);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    private void deleteProduct(@PathVariable int id){
+        log.info("Delete a product");
+        productsService.deleteProduct(id);
+    }
+
+    @PutMapping("/{id}")
+    private void updateProduct(@PathVariable int id, @RequestBody Product product){
+        log.info("Update product");
+        productsService.updateProduct(product, id);
+    }
+
+
 }
