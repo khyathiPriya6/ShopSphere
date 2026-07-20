@@ -1,0 +1,8 @@
+package com.example.ShopSphere.service;
+
+import com.example.ShopSphere.model.request.RegisterUserRequest;
+import com.example.ShopSphere.model.response.RegisterUserResponse;
+
+public interface UserService {
+    RegisterUserResponse registerUser(RegisterUserRequest userRequest);
+}
