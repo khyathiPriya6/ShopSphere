@@ -25,6 +25,7 @@ public class RegisterUserRequest {
      )
      private String email;
 
+     @NotBlank(message = "Password cannot be empty")
      private String password;
 
      @NotBlank(message = "firstName cannot be empty")

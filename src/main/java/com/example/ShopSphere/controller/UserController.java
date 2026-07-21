@@ -1,6 +1,8 @@
 package com.example.ShopSphere.controller;
 
+import com.example.ShopSphere.model.request.LoginUserRequest;
 import com.example.ShopSphere.model.request.RegisterUserRequest;
+import com.example.ShopSphere.model.response.LoginUserResponse;
 import com.example.ShopSphere.model.response.RegisterUserResponse;
 import com.example.ShopSphere.service.UserService;
 import jakarta.validation.Valid;
@@ -25,6 +27,14 @@ public class UserController {
         log.info("Registering user");
         return userService.registerUser(userDetails);
     }
+
+    @PostMapping("/login")
+    public LoginUserResponse login(@Valid @RequestBody LoginUserRequest loginRequest){
+        log.info("User login");
+        return userService.loginUser(loginRequest);
+    }
+
+
 
 
 }

@@ -1,8 +1,14 @@
 package com.example.ShopSphere.service.impl;
 
+import com.example.ShopSphere.config.JwtService;
+import com.example.ShopSphere.model.entity.Token;
 import com.example.ShopSphere.model.entity.User;
+import com.example.ShopSphere.model.enums.TokenType;
+import com.example.ShopSphere.model.request.LoginUserRequest;
 import com.example.ShopSphere.model.request.RegisterUserRequest;
+import com.example.ShopSphere.model.response.LoginUserResponse;
 import com.example.ShopSphere.model.response.RegisterUserResponse;
+import com.example.ShopSphere.repository.TokenRepository;
 import com.example.ShopSphere.repository.UserRepository;
 import com.example.ShopSphere.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +20,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    TokenRepository tokenRepository;
+
+    @Autowired
+    JwtService jwtService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -35,11 +47,53 @@ public class UserServiceImpl implements UserService {
                 .role(userRequest.getRole())
                 .build();
         User user = userRepository.save(userDetails);
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        saveUserToken(user, jwtToken);
         return RegisterUserResponse.builder()
                 .userId(user.getUserId())
                 .userName(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
+
+    @Override
+    public LoginUserResponse loginUser(LoginUserRequest loginUserRequest){
+        User user = userRepository.findByEmail(loginUserRequest.getEmail());
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(user, accessToken);
+        return LoginUserResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUserId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+
 }
