@@ -5,8 +5,10 @@ import com.example.ShopSphere.model.entity.Token;
 import com.example.ShopSphere.model.entity.User;
 import com.example.ShopSphere.model.enums.TokenType;
 import com.example.ShopSphere.model.request.LoginUserRequest;
+import com.example.ShopSphere.model.request.LogoutUserRequest;
 import com.example.ShopSphere.model.request.RegisterUserRequest;
 import com.example.ShopSphere.model.response.LoginUserResponse;
+import com.example.ShopSphere.model.response.LogoutUserResponse;
 import com.example.ShopSphere.model.response.RegisterUserResponse;
 import com.example.ShopSphere.repository.TokenRepository;
 import com.example.ShopSphere.repository.UserRepository;
@@ -71,6 +73,14 @@ public class UserServiceImpl implements UserService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Override
+    public LogoutUserResponse logout(LogoutUserRequest logoutUserRequest){
+        User user = userRepository.findByUserId(logoutUserRequest.getUserId());
+        revokeAllUserTokens(user);
+        String logOutSuccessMessage = "Logged out successfully";
+        return LogoutUserResponse.builder().message(logOutSuccessMessage).build();
     }
 
     private void saveUserToken(User user, String jwtToken) {

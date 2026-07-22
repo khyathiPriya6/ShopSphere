@@ -1,18 +1,17 @@
 package com.example.ShopSphere.controller;
 
 import com.example.ShopSphere.model.request.LoginUserRequest;
+import com.example.ShopSphere.model.request.LogoutUserRequest;
 import com.example.ShopSphere.model.request.RegisterUserRequest;
 import com.example.ShopSphere.model.response.LoginUserResponse;
+import com.example.ShopSphere.model.response.LogoutUserResponse;
 import com.example.ShopSphere.model.response.RegisterUserResponse;
 import com.example.ShopSphere.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -34,7 +33,10 @@ public class UserController {
         return userService.loginUser(loginRequest);
     }
 
-
-
+    @GetMapping("/logout")
+    public LogoutUserResponse logout(@Valid @RequestBody LogoutUserRequest logoutUserRequest){
+        log.info("User logout");
+        return userService.logout(logoutUserRequest);
+    }
 
 }
